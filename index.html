@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun English Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffb6b9;
+            --secondary: #bbded6;
+            --accent: #fae3d9;
+            --text-dark: #4a4a4a;
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-dark);
+            padding: 20px;
+        }
+
+        /* Container */
+        #app {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            min-height: 80vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 900;
+            font-size: 2.5rem;
+            color: #3b5998;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.8);
+            letter-spacing: 2px;
+        }
+
+        /* Views */
+        .view {
+            display: none;
+            animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .view.active {
+            display: block;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Navigation Buttons */
+        .nav-btn {
+            background-color: white;
+            border: 4px solid #3b5998;
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #3b5998;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .nav-btn:active {
+            transform: translateY(2px);
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Grid Layouts */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+        }
+        
+        .card:hover {
+            transform: scale(1.05) translateY(-5px);
+            border-color: #ffb6b9;
+            box-shadow: 0 15px 30px rgba(255, 182, 185, 0.4);
+        }
+
+        .card:active {
+            transform: scale(0.95);
+        }
+
+        .card.bounce {
+            animation: bounceIn 0.5s;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9) translateY(10px); }
+            100% { transform: scale(1); }
+        }
+
+        .emoji-large {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            line-height: 1;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #4a4a4a;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
+            border: 2px solid white;
+        }
+        
+        .category-card.game {
+            background: linear-gradient(135deg, #ffd194, #70e1f5);
+            border: 2px solid #fff;
+            color: #333;
+        }
+
+        /* Game Mode */
+        .game-prompt {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 900;
+            color: #3b5998;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .game-speaker {
+            display: inline-block;
+            cursor: pointer;
+            margin-left: 15px;
+            font-size: 2.5rem;
+            transition: transform 0.2s;
+        }
+        .game-speaker:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        /* Feedback Screen */
+        #feedback-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        #feedback-screen.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .feedback-star {
+            font-size: 10rem;
+            animation: spinGrow 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes spinGrow {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        @keyframes shakeWrong {
+            0%, 100% {transform: translateX(0) scale(1);}
+            25% {transform: translateX(-10px) scale(0.98);}
+            50% {transform: translateX(10px) scale(0.98);}
+            75% {transform: translateX(-10px) scale(0.98);}
+        }
+
+        /* Bubble Game Mode */
+        #bubble-game-container {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            background: linear-gradient(to top, #89f7fe 0%, #66a6ff 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+            border: 4px solid white;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -150px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                inset 10px 10px 20px rgba(255, 255, 255, 0.6),
+                inset -10px -10px 20px rgba(0, 0, 0, 0.1),
+                0 5px 15px rgba(0,0,0,0.15);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .bubble:active {
+            transform: scale(0.9);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-80vh) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .bubble.popped {
+            animation: pop 0.3s forwards !important;
+            pointer-events: none;
+        }
+        
+        .bubble-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+            justify-content: center;
+        }
+
+        /* Catch Game Mode */
+        #view-game-catch.active {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+            touch-action: none;
+        }
+
+        #catch-game-container {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #e0f7fa 0%, #ffffff 100%);
+            border-radius: 15px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .falling-item {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            text-align: center;
+            top: -150px; 
+            user-select: none;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        @keyframes fallDown {
+            0% { top: -150px; }
+            100% { top: 120%; }
+        }
+
+        #basket-container {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 6rem;
+            z-index: 10;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-shadow: 0 10px 15px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        .basket-happy {
+            transform: translateX(-50%) scale(1.2) translateY(-20px) !important;
+        }
+
+        /* Whack-a-Mole Mode */
+        #view-game-whack.active {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+
+        .whack-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            width: 100%;
+            justify-content: center;
+            align-content: center;
+        }
+
+        .whack-hole {
+            background: radial-gradient(ellipse at center, #3e2723 0%, #1a100f 100%);
+            border-radius: 50%; /* Circle hole for more standard look */
+            position: relative;
+            box-shadow: inset 0 8px 15px rgba(0,0,0,0.9), 0 2px 0 rgba(255,255,255,0.2);
+            overflow: visible; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1; /* Square cells for hole */
+            z-index: 1;
+        }
+
+        .whack-item {
+            position: absolute;
+            font-size: 7rem; /* Large enough to fill the circular hole */
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            transform: translateY(30px) scale(0.2);
+            opacity: 0;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            z-index: 10;
+        }
+        
+        .whack-item.popped {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <h1>✨ Fun English Learning ✨</h1>
+
+        <!-- View: Main Menu -->
+        <div id="view-menu" class="view active">
+            <div class="grid-container" id="menu-container">
+            </div>
+        </div>
+
+        <!-- View: Category Items -->
+        <div id="view-items" class="view">
+            <div class="header-controls">
+                <button class="nav-btn" onclick="goHome()">⬅️ Home (回主選單)</button>
+                <h2 id="current-category-title" style="margin:0; font-size: 2.2rem; color: #3b5998;">Category</h2>
+            </div>
+            <div class="grid-container" id="items-container">
+            </div>
+        </div>
+
+        <!-- View: Game Menu -->
+        <div id="view-game-menu" class="view">
+            <div class="header-controls">
+                <button class="nav-btn" onclick="goHome()">⬅️ Home (回主選單)</button>
+                <h2 style="margin:0; font-size: 2.2rem; color: #3b5998;">🎮 Choose Game Mode (選擇遊戲類型)</h2>
+            </div>
+            <div class="grid-container" id="game-menu-container">
+            </div>
+        </div>
+
+        <!-- View: Bubble Game Menu -->
+        <div id="view-bubble-menu" class="view">
+            <div class="header-controls">
+                <button class="nav-btn" onclick="goHome()">⬅️ Home (回主選單)</button>
+                <h2 style="margin:0; font-size: 2.2rem; color: #3b5998;">🫧 Choose Bubble Pop</h2>
+            </div>
+            <div class="grid-container" id="bubble-menu-container">
+            </div>
+        </div>
+
+        <!-- View: Bubble Game Mode -->
+        <div id="view-game-bubble" class="view">
+            <div class="header-controls">
+                <button class="nav-btn" onclick="stopBubbleGame(); switchView('view-bubble-menu')">⬅️ Back (上一頁)</button>
+                <h2 style="margin:0; font-size: 2.2rem; color: #3b5998;">🫧 Bubble Pop!</h2>
+            </div>
+            <div class="game-prompt" style="margin-bottom: 0px; padding: 10px;">
+                <div style="font-size: 1.5rem; color: #888; font-weight: 600; margin-bottom: 5px;">Listen & Pop (聽聽看，戳破泡泡):</div>
+                <div style="font-size: 2rem;">請問 <span id="bubble-target-word" style="color: #ff6b6b; font-weight: 900;">...</span> 在哪裡呢？ <span class="game-speaker" onclick="replayBubbleAudio()">🔊</span></div>
+            </div>
+            <div id="bubble-game-container">
+                <!-- Bubbles will spawn here -->
+            </div>
+        </div>
+
+        <!-- View: Whack Menu -->
+        <div id="view-whack-menu" class="view">
+            <div class="header-controls">
+                <button class="nav-btn" onclick="goHome()">⬅️ Home (回主選單)</button>
+                <h2 style="margin:0; font-size: 2.2rem; color: #3b5998;">🔨 Choose Whack It</h2>
+            </div>
+            <div class="grid-container" id="whack-menu-container">
+            </div>
+        </div>
+
+        <!-- View: Catch Game Menu -->
+        <div id="view-catch-menu" class="view">
+            <div class="header-controls">
+                <button class="nav-btn" onclick="goHome()">⬅️ Home (回主選單)</button>
+                <h2 style="margin:0; font-size: 2.2rem; color: #3b5998;">🧺 Choose Catch Game</h2>
+            </div>
+            <div class="grid-container" id="catch-menu-container">
+            </div>
+        </div>
+
+        <!-- View: Catch Game Mode -->
+        <div id="view-game-catch" class="view">
+            <div class="header-controls" style="margin-bottom: 5px;">
+                <button class="nav-btn" onclick="stopCatchGame(); switchView('view-catch-menu')">⬅️ Exit (離開)</button>
+                <div style="display: flex; gap: 20px; font-size: 1.5rem; font-weight: bold; background: white; padding: 5px 15px; border-radius: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    <div style="color: #d35400;">⏱️ <span id="catch-time">30</span>s</div>
+                    <div style="color: #f39c12;">🏆 <span id="catch-score">0</span></div>
+                </div>
+            </div>
+            <div class="game-prompt" style="margin-bottom: 10px; padding: 10px; flex-shrink: 0;">
+                <div style="font-size: 1.5rem; color: #888; font-weight: 600; margin-bottom: 5px;">Catch me! (接住或者點擊我的圖片):</div>
+                <div style="font-size: 2rem;">請問 <span id="catch-target-word" style="color: #ff6b6b; font-weight: 900;">...</span> 在哪裡呢？ <span class="game-speaker" onclick="replayCatchAudio()">🔊</span></div>
+            </div>
+            <div id="catch-game-container">
+                <div id="basket-container">🧺</div>
+            </div>
+        </div>
+
+        <!-- View: Whack Game Mode -->
+        <div id="view-game-whack" class="view">
+            <div class="header-controls" style="margin-bottom: 5px;">
+                <button class="nav-btn" onclick="stopWhackGame(); switchView('view-whack-menu')">⬅️ Exit (離開)</button>
+                <div style="display: flex; gap: 20px; font-size: 1.5rem; font-weight: bold; background: white; padding: 5px 15px; border-radius: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    <div style="color: #d35400;">⏱️ <span id="whack-time">30</span>s</div>
+                    <div style="color: #f39c12;">🏆 <span id="whack-score">0</span></div>
+                </div>
+            </div>
+            <div class="game-prompt" style="margin-bottom: 10px; padding: 10px; flex-shrink: 0;">
+                <div style="font-size: 1.5rem; color: #888; font-weight: 600; margin-bottom: 5px;">Whack me! (敲擊出現的正確圖片):</div>
+                <div style="font-size: 2rem;">請問 <span id="whack-target-word" style="color: #ff6b6b; font-weight: 900;">...</span> 在哪裡呢？ <span class="game-speaker" onclick="replayWhackAudio()">🔊</span></div>
+            </div>
+            <div class="whack-grid" id="whack-game-container">
+                <!-- 9 holes injected by JS -->
+            </div>
+        </div>
+
+        <!-- View: Game Mode -->
+        <div id="view-game" class="view">
+            <div class="header-controls">
+                <button class="nav-btn" onclick="switchView('view-game-menu')">⬅️ Back (上一頁)</button>
+                <h2 style="margin:0; font-size: 2.2rem; color: #3b5998;">🎮 Game (遊戲)</h2>
+            </div>
+            <div class="game-prompt" id="game-prompt-container">
+                <div style="font-size: 1.5rem; color: #888; font-weight: 600; margin-bottom: 10px;">Listen & Read (聽聽看並找出):</div>
+                <div>請問 <span id="game-target-word" style="color: #ff6b6b;">...</span> 在哪裡呢？ <span class="game-speaker" onclick="replayGameAudio()">🔊</span></div>
+            </div>
+            <div class="grid-container" id="game-options-container">
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback UI -->
+    <div id="final-score-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="font-size: 8rem; animation: bounce 0.6s infinite alternate ease-in-out;">🏆</div>
+        <h2 style="font-size: 3rem; color: #3b5998; margin: 20px 0;">Time's Up! 時間到！</h2>
+        <h3 style="font-size: 2.5rem; color: #f39c12; margin: 10px 0;">You got <span id="final-score-number" style="font-size: 4rem; color: #e74c3c;">0</span> points!</h3>
+        <button class="nav-btn" style="margin-top: 30px; font-size: 1.5rem; padding: 15px 30px;" onclick="closeFinalScore()">Play Again! (再玩一次)</button>
+    </div>
+
+    <div id="feedback-screen">
+        <div class="feedback-star">🌟</div>
+        <h2 style="font-size: 4rem; color: #ffb6b9; margin-top: 20px; text-shadow: 2px 2px white;">Great Job!</h2>
+    </div>
+
+    <script>
+        // --- API & Audio System ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSuccessSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.1); 
+            osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.2); 
+            
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1.0);
+        }
+
+        function playWrongSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.3);
+            
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.1);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function speakWord(word, callback) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85; 
+            utterance.pitch = 1.1; 
+            
+            const voices = window.speechSynthesis.getVoices();
+            const enVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) || voices.find(v => v.lang.startsWith('en'));
+            if(enVoice) utterance.voice = enVoice;
+
+            if (callback) utterance.onend = callback;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function speakQuestion_zh(word) {
+            window.speechSynthesis.cancel();
+            
+            const voices = window.speechSynthesis.getVoices();
+            const twVoice = voices.find(v => v.lang.includes('zh-TW') || v.lang.includes('zh-HK') || v.lang.includes('zh-CN'));
+            const enVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) || voices.find(v => v.lang.startsWith('en'));
+
+            // Use a 100ms delay to ensure cancel() has finished clearing the queue
+            setTimeout(() => {
+                const u1 = new SpeechSynthesisUtterance("請問 ");
+                u1.lang = 'zh-TW';
+                u1.rate = 0.85;
+                u1.pitch = 1.1;
+                u1.volume = 0.55; 
+                if(twVoice) u1.voice = twVoice;
+
+                const u2 = new SpeechSynthesisUtterance(word);
+                u2.lang = 'en-US';
+                u2.rate = 0.8;
+                u2.pitch = 1.1;
+                u2.volume = 1.0; 
+                if(enVoice) u2.voice = enVoice;
+
+                const u3 = new SpeechSynthesisUtterance(" 在哪裡呢？");
+                u3.lang = 'zh-TW';
+                u3.rate = 0.85;
+                u3.pitch = 1.1;
+                u3.volume = 0.55; 
+                if(twVoice) u3.voice = twVoice;
+
+                window.speechSynthesis.speak(u1);
+                window.speechSynthesis.speak(u2);
+                window.speechSynthesis.speak(u3);
+            }, 100);
+        }
+
+        function speakSuccess_zh(word) {
+            window.speechSynthesis.cancel();
+            
+            const voices = window.speechSynthesis.getVoices();
+            let twVoice = voices.find(v => (v.lang.includes('zh') || v.lang.includes('cmn')) && 
+                (v.name.includes('Yunxi') || v.name.includes('Male') || v.name.includes('Yunjian')));
+            let isMale = true;
+            if (!twVoice) {
+                twVoice = voices.find(v => v.lang.includes('zh-TW') || v.lang.includes('zh-HK') || v.lang.includes('zh-CN'));
+                isMale = false;
+            }
+            const enVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) || voices.find(v => v.lang.startsWith('en'));
+
+            setTimeout(() => {
+                const u1 = new SpeechSynthesisUtterance("你好棒！");
+                u1.lang = 'zh-TW';
+                u1.rate = 1.0;
+                u1.pitch = isMale ? 1.0 : 0.5; 
+                u1.volume = 1.0; 
+                if(twVoice) u1.voice = twVoice;
+
+                window.speechSynthesis.speak(u1);
+                
+                if (word) {
+                    const u2 = new SpeechSynthesisUtterance(word);
+                    u2.lang = 'en-US';
+                    u2.rate = 0.8;
+                    u2.pitch = 1.1;
+                    u2.volume = 1.0; 
+                    if(enVoice) u2.voice = enVoice;
+                    window.speechSynthesis.speak(u2);
+                }
+            }, 50);
+        }
+
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+
+        // --- Data ---
+        const DB = {
+            alphabet: {
+                title: "Alphabet (字母)", icon: "🅰️",
+                items: [
+                    {w: 'A', e: 'A'}, {w: 'B', e: 'B'}, {w: 'C', e: 'C'}, {w: 'D', e: 'D'},
+                    {w: 'E', e: 'E'}, {w: 'F', e: 'F'}, {w: 'G', e: 'G'}, {w: 'H', e: 'H'},
+                    {w: 'I', e: 'I'}, {w: 'J', e: 'J'}, {w: 'K', e: 'K'}, {w: 'L', e: 'L'},
+                    {w: 'M', e: 'M'}, {w: 'N', e: 'N'}, {w: 'O', e: 'O'}, {w: 'P', e: 'P'},
+                    {w: 'Q', e: 'Q'}, {w: 'R', e: 'R'}, {w: 'S', e: 'S'}, {w: 'T', e: 'T'},
+                    {w: 'U', e: 'U'}, {w: 'V', e: 'V'}, {w: 'W', e: 'W'}, {w: 'X', e: 'X'},
+                    {w: 'Y', e: 'Y'}, {w: 'Z', e: 'Z'}
+                ]
+            },
+            numbers: {
+                title: "Numbers (數字)", icon: "1️⃣",
+                items: [
+                    {w: 'One', e: '1', num: 1}, {w: 'Two', e: '2', num: 2}, 
+                    {w: 'Three', e: '3', num: 3}, {w: 'Four', e: '4', num: 4}, 
+                    {w: 'Five', e: '5', num: 5}, {w: 'Six', e: '6', num: 6},
+                    {w: 'Seven', e: '7', num: 7}, {w: 'Eight', e: '8', num: 8}, 
+                    {w: 'Nine', e: '9', num: 9}, {w: 'Ten', e: '10', num: 10}
+                ]
+            },
+            animals: {
+                title: "Animals (動物)", icon: "🐶",
+                items: [
+                    {w: 'Dog', e: '🐶'}, {w: 'Cat', e: '🐱'}, {w: 'Elephant', e: '🐘'},
+                    {w: 'Lion', e: '🦁'}, {w: 'Monkey', e: '🐵'}, {w: 'Rabbit', e: '🐰'},
+                    {w: 'Pig', e: '🐷'}, {w: 'Bear', e: '🐻'}, {w: 'Tiger', e: '🐯'},
+                    {w: 'Cow', e: '🐮'}, {w: 'Chicken', e: '🐔'}, {w: 'Bird', e: '🐦'}
+                ]
+            },
+            vehicles: {
+                title: "Vehicles (交通)", icon: "🚌",
+                items: [
+                    {w: 'Bus', e: '🚌'}, {w: 'Car', e: '🚗'}, {w: 'Train', e: '🚂'},
+                    {w: 'Airplane', e: '✈️'}, {w: 'Bicycle', e: '🚲'}, {w: 'Boat', e: '⛵'},
+                    {w: 'Helicopter', e: '🚁'}, {w: 'Motorcycle', e: '🏍️'}, {w: 'Rocket', e: '🚀'}, {w: 'Taxi', e: '🚕'}
+                ]
+            },
+            daily: {
+                title: "Daily (生活)", icon: "🍎",
+                items: [
+                    {w: 'Apple', e: '🍎'}, {w: 'Book', e: '📖'}, {w: 'Water', e: '💧'},
+                    {w: 'Milk', e: '🥛'}, {w: 'House', e: '🏠'}, {w: 'Sun', e: '☀️'},
+                    {w: 'Moon', e: '🌙'}, {w: 'Star', e: '⭐'}, {w: 'Ball', e: '⚽'},
+                    {w: 'Shoes', e: '👞'}, {w: 'Tree', e: '🌳'}, {w: 'Flower', e: '🌸'}
+                ]
+            },
+            colors: {
+                title: "Colors (顏色)", icon: "🎨",
+                items: [
+                    {w: 'Red', e: '🟥'}, {w: 'Orange', e: '🟧'}, {w: 'Yellow', e: '🟨'},
+                    {w: 'Green', e: '🟩'}, {w: 'Blue', e: '🟦'}, {w: 'Purple', e: '🟪'},
+                    {w: 'Brown', e: '🟫'}, {w: 'Black', e: '⬛'}, {w: 'White', e: '⬜'}
+                ]
+            },
+            shapes: {
+                title: "Shapes (形狀)", icon: "🔺",
+                items: [
+                    {w: 'Circle', e: '🔴'}, {w: 'Square', e: '🟦'}, {w: 'Triangle', e: '🔺'},
+                    {w: 'Rectangle', e: '<div style="width: 1.4em; height: 0.8em; background-color: #4cd137; border-radius: 8px; display: inline-block; vertical-align: middle;"></div>'}, {w: 'Star', e: '⭐'}, {w: 'Heart', e: '❤️'}, {w: 'Diamond', e: '🔶'}
+                ]
+            }
+        };
+
+        // --- App Logic ---
+        function switchView(viewId) {
+            window.scrollTo(0, 0);
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.speechSynthesis.cancel();
+        }
+
+        function goHome() { switchView('view-menu'); }
+
+        function playFeedbackUI(el) {
+            el.classList.remove('bounce');
+            void el.offsetWidth;
+            el.classList.add('bounce');
+        }
+
+        function initMenu() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
+
+            for (let key in DB) {
+                const cat = DB[key];
+                const card = document.createElement('div');
+                card.className = 'card category-card';
+                card.innerHTML = `<div class="emoji-large">${cat.icon}</div><div class="card-title">${cat.title}</div>`;
+                card.onclick = () => { playFeedbackUI(card); openCategory(key); };
+                container.appendChild(card);
+            }
+
+            const gameBtn = document.createElement('div');
+            gameBtn.className = 'card category-card game';
+            gameBtn.innerHTML = `<div class="emoji-large">🎮</div><div class="card-title">Game Time!<br>(玩遊戲)</div>`;
+            gameBtn.onclick = () => { playFeedbackUI(gameBtn); openGameMenu(); };
+            container.appendChild(gameBtn);
+
+            const bubbleBtn = document.createElement('div');
+            bubbleBtn.className = 'card category-card game';
+            bubbleBtn.innerHTML = `<div class="emoji-large">🫧</div><div class="card-title">Bubble Pop!<br>(泡泡尋寶)</div>`;
+            bubbleBtn.onclick = () => { playFeedbackUI(bubbleBtn); openBubbleMenu(); };
+            container.appendChild(bubbleBtn);
+
+            const catchBtn = document.createElement('div');
+            catchBtn.className = 'card category-card game';
+            catchBtn.innerHTML = `<div class="emoji-large">🧺</div><div class="card-title">Catch It!<br>(天空接接樂)</div>`;
+            catchBtn.onclick = () => { playFeedbackUI(catchBtn); openCatchMenu(); };
+            container.appendChild(catchBtn);
+
+            const whackBtn = document.createElement('div');
+            whackBtn.className = 'card category-card game';
+            whackBtn.innerHTML = `<div class="emoji-large">🔨</div><div class="card-title">Whack It!<br>(瘋狂打地鼠)</div>`;
+            whackBtn.onclick = () => { playFeedbackUI(whackBtn); openWhackMenu(); };
+            container.appendChild(whackBtn);
+        }
+
+        function openWhackMenu() {
+            const container = document.getElementById('whack-menu-container');
+            container.innerHTML = '';
+            for (let key in DB) {
+                const cat = DB[key];
+                const card = document.createElement('div');
+                card.className = 'card category-card game';
+                card.innerHTML = `<div class="emoji-large">${cat.icon}</div><div class="card-title">${cat.title}</div>`;
+                card.onclick = () => { playFeedbackUI(card); startWhackGame(key); };
+                container.appendChild(card);
+            }
+            const allBtn = document.createElement('div');
+            allBtn.className = 'card category-card game';
+            allBtn.innerHTML = `<div class="emoji-large">🌟</div><div class="card-title">All Mixed!<br>(綜合挑戰)</div>`;
+            allBtn.onclick = () => { playFeedbackUI(allBtn); startWhackGame('all'); };
+            container.appendChild(allBtn);
+            switchView('view-whack-menu');
+        }
+
+        function openCatchMenu() {
+            const container = document.getElementById('catch-menu-container');
+            container.innerHTML = '';
+            for (let key in DB) {
+                const cat = DB[key];
+                const card = document.createElement('div');
+                card.className = 'card category-card game';
+                card.innerHTML = `<div class="emoji-large">${cat.icon}</div><div class="card-title">${cat.title}</div>`;
+                card.onclick = () => { playFeedbackUI(card); startCatchGame(key); };
+                container.appendChild(card);
+            }
+            const allBtn = document.createElement('div');
+            allBtn.className = 'card category-card game';
+            allBtn.innerHTML = `<div class="emoji-large">🌟</div><div class="card-title">All Mixed!<br>(綜合挑戰)</div>`;
+            allBtn.onclick = () => { playFeedbackUI(allBtn); startCatchGame('all'); };
+            container.appendChild(allBtn);
+
+            switchView('view-catch-menu');
+        }
+
+        function openBubbleMenu() {
+            const container = document.getElementById('bubble-menu-container');
+            container.innerHTML = '';
+            for (let key in DB) {
+                const cat = DB[key];
+                const card = document.createElement('div');
+                card.className = 'card category-card game';
+                card.innerHTML = `<div class="emoji-large">${cat.icon}</div><div class="card-title">${cat.title}</div>`;
+                card.onclick = () => { playFeedbackUI(card); startBubbleGame(key); };
+                container.appendChild(card);
+            }
+            const allBtn = document.createElement('div');
+            allBtn.className = 'card category-card game';
+            allBtn.innerHTML = `<div class="emoji-large">🌟</div><div class="card-title">All Mixed!<br>(綜合挑戰)</div>`;
+            allBtn.onclick = () => { playFeedbackUI(allBtn); startBubbleGame('all'); };
+            container.appendChild(allBtn);
+
+            switchView('view-bubble-menu');
+        }
+
+        function openGameMenu() {
+            const container = document.getElementById('game-menu-container');
+            container.innerHTML = '';
+            
+            for (let key in DB) {
+                const cat = DB[key];
+                const card = document.createElement('div');
+                card.className = 'card category-card game';
+                card.innerHTML = `<div class="emoji-large">${cat.icon}</div><div class="card-title">${cat.title}</div>`;
+                card.onclick = () => { playFeedbackUI(card); startMiniGame(key); };
+                container.appendChild(card);
+            }
+            
+            const allBtn = document.createElement('div');
+            allBtn.className = 'card category-card game';
+            allBtn.innerHTML = `<div class="emoji-large">🌟</div><div class="card-title">All Mixed!<br>(綜合挑戰)</div>`;
+            allBtn.onclick = () => { playFeedbackUI(allBtn); startMiniGame('all'); };
+            container.appendChild(allBtn);
+
+            switchView('view-game-menu');
+        }
+
+        function openCategory(key) {
+            const cat = DB[key];
+            document.getElementById('current-category-title').innerText = cat.title;
+            const container = document.getElementById('items-container');
+            container.innerHTML = '';
+
+            cat.items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                let innerContent = '';
+                if (item.num !== undefined) {
+                    let balls = '⚽'.repeat(item.num);
+                    innerContent = `
+                        <div style="font-size: 1.5rem; line-height: 1.2; margin-bottom: 5px; min-height: 40px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; max-width: 90%; gap: 2px;">${balls}</div>
+                        <div class="emoji-large" style="font-size: 3.5rem; margin-bottom: 5px;">${item.e}</div>
+                        <div class="card-title">${item.w}</div>
+                    `;
+                } else {
+                    let sub = item.sub ? `<div style="color:#888; font-size:1.2rem; margin-top:5px;">${item.sub}</div>` : '';
+                    innerContent = `<div class="emoji-large">${item.e}</div><div class="card-title">${item.w}</div>${sub}`;
+                }
+                card.innerHTML = innerContent;
+                
+                card.onclick = () => {
+                    playFeedbackUI(card);
+                    speakWord(item.w);
+                };
+                container.appendChild(card);
+            });
+            switchView('view-items');
+        }
+
+        // --- Game System ---
+        let gameTarget = null;
+        let gamePool = [];
+
+        function startMiniGame(categoryKey) {
+            gamePool = [];
+            if (categoryKey === 'all') {
+                ['alphabet', 'numbers', 'animals', 'vehicles', 'daily', 'colors', 'shapes'].forEach(k => {
+                    gamePool = gamePool.concat(DB[k].items);
+                });
+            } else {
+                gamePool = gamePool.concat(DB[categoryKey].items);
+            }
+            switchView('view-game');
+            nextGameRound();
+        }
+
+        function nextGameRound() {
+            gameTarget = gamePool[Math.floor(Math.random() * gamePool.length)];
+            let options = [gameTarget];
+            
+            while (options.length < 4) {
+                let r = gamePool[Math.floor(Math.random() * gamePool.length)];
+                if (!options.find(o => o.w === r.w)) options.push(r);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            document.getElementById('game-target-word').innerText = gameTarget.w;
+
+            const container = document.getElementById('game-options-container');
+            container.innerHTML = '';
+            
+            options.forEach(opt => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                if (opt.num !== undefined) {
+                    let balls = '⚽'.repeat(opt.num);
+                    card.innerHTML = `
+                        <div style="font-size: 1.5rem; line-height: 1.2; margin-bottom: 5px; display:flex; flex-wrap:wrap; justify-content:center; max-width: 90%; gap: 2px;">${balls}</div>
+                        <div class="emoji-large" style="font-size: 3.5rem; margin-bottom: 0;">${opt.e}</div>
+                    `;
+                } else {
+                    card.innerHTML = `<div class="emoji-large">${opt.e}</div>`;
+                }
+                
+                card.onclick = () => { checkGameAnswer(opt, card); };
+                container.appendChild(card);
+            });
+
+            setTimeout(replayGameAudio, 500);
+        }
+
+        function replayGameAudio() {
+            if (gameTarget) speakQuestion_zh(gameTarget.w);
+        }
+
+        function checkGameAnswer(opt, cardEl) {
+            if (opt.w === gameTarget.w) {
+                speakSuccess_zh(gameTarget.w);
+                playSuccessSound();
+                document.getElementById('game-target-word').innerText = gameTarget.w;
+                document.getElementById('feedback-screen').classList.add('show');
+                
+                setTimeout(() => {
+                    document.getElementById('feedback-screen').classList.remove('show');
+                    nextGameRound();
+                }, 2000);
+            } else {
+                playWrongSound();
+                speakWord('Oops!');
+                cardEl.style.animation = 'none';
+                void cardEl.offsetWidth;
+                cardEl.style.animation = 'shakeWrong 0.4s';
+                cardEl.style.borderColor = '#ff6b6b';
+                setTimeout(() => cardEl.style.borderColor = 'transparent', 400);
+            }
+        }
+
+        // --- Bubble Game Logic ---
+        let bubbleInterval;
+        let bubbleGameTarget = null;
+        let bubbleGamePool = [];
+
+        function startBubbleGame(categoryKey) {
+            bubbleGamePool = [];
+            if (categoryKey === 'all') {
+                ['alphabet', 'numbers', 'animals', 'vehicles', 'daily', 'colors', 'shapes'].forEach(k => {
+                    bubbleGamePool = bubbleGamePool.concat(DB[k].items);
+                });
+            } else {
+                bubbleGamePool = bubbleGamePool.concat(DB[categoryKey].items);
+            }
+            switchView('view-game-bubble');
+            nextBubbleRound();
+        }
+
+        function stopBubbleGame() {
+            clearInterval(bubbleInterval);
+            document.getElementById('bubble-game-container').innerHTML = '';
+        }
+
+        function nextBubbleRound() {
+            stopBubbleGame();
+            bubbleGameTarget = bubbleGamePool[Math.floor(Math.random() * bubbleGamePool.length)];
+            document.getElementById('bubble-target-word').innerText = bubbleGameTarget.w;
+            
+            setTimeout(replayBubbleAudio, 500);
+            
+            setTimeout(() => spawnBubble(true), 500); 
+            
+            bubbleInterval = setInterval(() => {
+                let isTarget = Math.random() < 0.35; 
+                spawnBubble(isTarget);
+            }, 2500); 
+        }
+
+        function replayBubbleAudio() {
+            if (bubbleGameTarget) speakQuestion_zh(bubbleGameTarget.w);
+        }
+
+        function spawnBubble(forceTarget = false) {
+            const container = document.getElementById('bubble-game-container');
+            if (!container) return;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            
+            const size = Math.random() * 40 + 100; // 100 to 140px
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            
+            const leftPos = Math.random() * 80;
+            bubble.style.left = `${leftPos}%`;
+            
+            const duration = Math.random() * 5 + 10; 
+            bubble.style.animation = `floatUp ${duration}s linear forwards`;
+            
+            let itemData;
+            if (forceTarget) {
+                itemData = bubbleGameTarget;
+            } else {
+                itemData = bubbleGamePool[Math.floor(Math.random() * bubbleGamePool.length)];
+            }
+            
+            let displayHTML = '';
+            if (itemData.num !== undefined) {
+                let balls = '⚽'.repeat(itemData.num);
+                displayHTML = `
+                    <div style="font-size: 0.8rem; line-height: 1.1; margin-bottom: 2px; display:flex; flex-wrap:wrap; justify-content:center; max-width: 90%; gap: 1px; letter-spacing:-1px;">${balls}</div>
+                    <div style="font-size: 2.2rem; font-weight:800; line-height:1;">${itemData.e}</div>
+                `;
+            } else {
+                displayHTML = `<div style="font-size: ${size/2.5}px;">${itemData.e}</div>`;
+            }
+
+            bubble.innerHTML = `<div class="bubble-content">${displayHTML}</div>`;
+            
+            bubble.onclick = () => {
+                if (itemData.w === bubbleGameTarget.w) {
+                    stopBubbleGame();
+                    bubble.classList.add('popped');
+                    speakSuccess_zh(bubbleGameTarget.w);
+                    playSuccessSound();
+                    document.getElementById('feedback-screen').classList.add('show');
+                    setTimeout(() => {
+                        document.getElementById('feedback-screen').classList.remove('show');
+                        nextBubbleRound();
+                    }, 2000);
+                } else {
+                    playWrongSound();
+                    speakWord('Oops!');
+                    bubble.style.transform = 'scale(0.9) translateX(10px)';
+                    setTimeout(() => {
+                        if (!bubble.classList.contains('popped')) {
+                            bubble.style.transform = 'none';
+                        }
+                    }, 200);
+                }
+            };
+            
+            bubble.onanimationend = (e) => {
+                if(e.animationName === 'floatUp' && bubble.parentNode) {
+                    bubble.parentNode.removeChild(bubble);
+                }
+            };
+            
+            container.appendChild(bubble);
+        }
+        // --- Global Game State ---
+        let currentFinalScoreMode = 'catch'; 
+
+        // --- Catch Game Logic ---
+        let catchGameTarget = null;
+        let catchGamePool = [];
+        let catchInterval;
+        let catchTimeLeft = 30;
+        let catchTimerInterval;
+        let catchScore = 0;
+
+        function startCatchGame(categoryKey) {
+            catchGamePool = [];
+            if (categoryKey === 'all') {
+                ['alphabet', 'numbers', 'animals', 'vehicles', 'daily', 'colors', 'shapes'].forEach(k => {
+                    catchGamePool = catchGamePool.concat(DB[k].items);
+                });
+            } else {
+                catchGamePool = catchGamePool.concat(DB[categoryKey].items);
+            }
+            
+            catchScore = 0;
+            catchTimeLeft = 30;
+            currentFinalScoreMode = 'catch';
+            document.getElementById('catch-score').innerText = catchScore;
+            document.getElementById('catch-time').innerText = catchTimeLeft;
+            
+            switchView('view-game-catch');
+            
+            setTimeout(() => {
+                 nextCatchTarget(); 
+                 catchTimerInterval = setInterval(updateCatchTimer, 1000);
+                 setTimeout(() => spawnFallingItem(true), 1000); 
+                 catchInterval = setInterval(() => {
+                     let isTarget = Math.random() < 0.40; 
+                     spawnFallingItem(isTarget);
+                 }, 2000); // 2000ms creates a steady stream of targets for 60s
+            }, 500);
+        }
+
+        function updateCatchTimer() {
+            catchTimeLeft--;
+            document.getElementById('catch-time').innerText = catchTimeLeft;
+            if (catchTimeLeft <= 0) {
+                stopCatchGame();
+                window.scrollTo(0, 0);
+                document.getElementById('final-score-number').innerText = catchScore;
+                document.getElementById('final-score-screen').style.display = 'flex';
+                playSuccessSound(); 
+            }
+        }
+
+        function closeFinalScore() {
+            document.getElementById('final-score-screen').style.display = 'none';
+            if (currentFinalScoreMode === 'whack') {
+                switchView('view-whack-menu');
+            } else {
+                switchView('view-catch-menu');
+            }
+        }
+
+        function stopCatchGame() {
+            clearInterval(catchInterval);
+            clearInterval(catchTimerInterval);
+            document.querySelectorAll('.falling-item').forEach(el => el.remove());
+        }
+
+        function nextCatchTarget(silent = false) {
+            catchGameTarget = catchGamePool[Math.floor(Math.random() * catchGamePool.length)];
+            document.getElementById('catch-target-word').innerText = catchGameTarget.w;
+            if (!silent) {
+                replayCatchAudio();
+            }
+            // Force a correct item to spawn so they dont wait too long
+            setTimeout(() => spawnFallingItem(true), 1000); 
+        }
+
+        function replayCatchAudio() {
+            if (catchGameTarget) speakQuestion_zh(catchGameTarget.w);
+        }
+
+        function spawnFallingItem(forceTarget = false) {
+            const container = document.getElementById('catch-game-container');
+            if (!container) return;
+            
+            const itemEl = document.createElement('div');
+            itemEl.className = 'falling-item';
+            
+            const size = Math.random() * 20 + 80; 
+            itemEl.style.width = `${size}px`;
+            
+            const leftPos = Math.random() * 70 + 10; // 10% to 80% left
+            itemEl.style.left = `${leftPos}%`;
+            
+            const duration = Math.random() * 4 + 10; // 10 to 14 seconds to fall
+            itemEl.style.animation = `fallDown ${duration}s linear forwards`;
+            
+            let itemData;
+            if (forceTarget) {
+                itemData = catchGameTarget;
+            } else {
+                itemData = catchGamePool[Math.floor(Math.random() * catchGamePool.length)];
+            }
+            
+            let displayHTML = '';
+            if (itemData.num !== undefined) {
+                let balls = '⚽'.repeat(itemData.num);
+                displayHTML = `
+                    <div style="font-size: 0.8rem; line-height: 1.1; margin-bottom: 2px; display:flex; flex-wrap:wrap; justify-content:center; max-width: 90%; gap: 1px;">${balls}</div>
+                    <div style="font-size: 2.5rem; font-weight:800; line-height:1;">${itemData.e}</div>
+                `;
+            } else {
+                displayHTML = `<div style="font-size: 3.5rem; line-height:1;">${itemData.e}</div>`;
+            }
+
+            itemEl.innerHTML = displayHTML;
+            
+            let hitInterval = setInterval(() => {
+                if (!itemEl.parentNode || itemEl.dataset.hit) {
+                    clearInterval(hitInterval);
+                    return;
+                }
+                const bEl = document.getElementById('basket-container');
+                const iRect = itemEl.getBoundingClientRect();
+                const bRect = bEl.getBoundingClientRect();
+
+                if (iRect.bottom >= bRect.top + 20 &&
+                    iRect.top <= bRect.bottom &&
+                    iRect.right >= bRect.left + 10 &&
+                    iRect.left <= bRect.right - 10) {
+                    
+                    itemEl.dataset.hit = "true";
+                    clearInterval(hitInterval);
+                    itemEl.click(); 
+                }
+            }, 50);
+
+            itemEl.onclick = () => {
+                itemEl.dataset.hit = "true";
+                if (itemData.w === catchGameTarget.w) {
+                    
+                    let caughtWord = catchGameTarget.w;
+                    // Removed: nextCatchTarget(true); -> Keep the same target for the whole 60 seconds!
+                    
+                    catchScore++;
+                    document.getElementById('catch-score').innerText = catchScore;
+                    playSuccessSound();
+
+                    const basketEl = document.getElementById('basket-container');
+                    const itemRect = itemEl.getBoundingClientRect();
+                    const basketRect = basketEl.getBoundingClientRect();
+
+                    const flyX = basketRect.left + (basketRect.width / 2) - (itemRect.width / 2) - itemRect.left;
+                    const flyY = basketRect.top + (basketRect.height / 2) - (itemRect.height / 2) - itemRect.top;
+
+                    itemEl.style.animation = 'none';
+                    itemEl.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    itemEl.style.transform = `translate(${flyX}px, ${flyY}px) scale(0.2)`;
+                    itemEl.style.opacity = '0';
+
+                    setTimeout(() => {
+                        basketEl.classList.add('basket-happy');
+                        setTimeout(() => basketEl.classList.remove('basket-happy'), 400);
+
+                        speakSuccess_zh(caughtWord);
+                    }, 400); 
+                } else {
+                    playWrongSound();
+                    speakWord('Oops!');
+                    itemEl.style.transform = 'rotate(15deg) scale(0.9)';
+                    itemEl.style.borderColor = '#ff6b6b';
+                    itemEl.style.border = '2px solid red';
+                    setTimeout(() => {
+                        itemEl.style.transform = 'none';
+                        itemEl.style.border = 'none';
+                    }, 300);
+                }
+            };
+            
+            itemEl.onanimationend = (e) => {
+                if(e.animationName === 'fallDown' && itemEl.parentNode) {
+                    itemEl.parentNode.removeChild(itemEl);
+                }
+            };
+            
+            container.appendChild(itemEl);
+        }
+
+        const catchView = document.getElementById('view-game-catch');
+        const basketContainer = document.getElementById('basket-container');
+
+        function handleBasketMove(e) {
+            if (catchView.classList.contains('active')) {
+                let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const rect = catchView.getBoundingClientRect();
+                let leftPos = clientX - rect.left;
+                if (leftPos < 40) leftPos = 40;
+                if (leftPos > rect.width - 40) leftPos = rect.width - 40;
+                basketContainer.style.left = leftPos + 'px';
+            }
+        }
+
+        window.addEventListener('mousemove', handleBasketMove);
+        window.addEventListener('touchmove', handleBasketMove, {passive: true});
+
+        // --- Whack-a-Mole Game Logic ---
+        let whackScore = 0;
+        let whackTimeLeft = 30;
+        let whackGameTarget = null;
+        let whackGamePool = [];
+        let whackTimerInterval = null;
+        let whackHoleTimeouts = new Array(9).fill(null);
+        let whackHoleActive = new Array(9).fill(false);
+
+        function replayWhackAudio() {
+            if (whackGameTarget) speakQuestion_zh(whackGameTarget.w);
+        }
+
+        function startWhackGame(categoryKey) {
+            whackGamePool = [];
+            if (categoryKey === 'all') {
+                for (let k in DB) whackGamePool = whackGamePool.concat(DB[k].items);
+            } else {
+                whackGamePool = [...DB[categoryKey].items];
+            }
+            
+            whackScore = 0;
+            whackTimeLeft = 30;
+            currentFinalScoreMode = 'whack';
+            document.getElementById('whack-score').innerText = whackScore;
+            document.getElementById('whack-time').innerText = whackTimeLeft;
+
+            const grid = document.getElementById('whack-game-container');
+            grid.innerHTML = '';
+            for(let i=0; i<9; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'whack-hole';
+                const item = document.createElement('div');
+                item.className = 'whack-item';
+                item.id = `whack-item-${i}`;
+                item.onclick = () => handleWhackClick(i);
+                hole.appendChild(item);
+                grid.appendChild(hole);
+            }
+
+            const targetIndex = Math.floor(Math.random() * whackGamePool.length);
+            whackGameTarget = whackGamePool[targetIndex];
+            document.getElementById('whack-target-word').innerText = whackGameTarget.w;
+
+            speakQuestion_zh(whackGameTarget.w);
+            switchView('view-game-whack');
+            
+            setTimeout(() => {
+                 whackTimerInterval = setInterval(updateWhackTimer, 1000);
+                 spawnWhackItemsLoop();
+            }, 2000); // Wait 2s for instruction to breathe
+        }
+
+        function updateWhackTimer() {
+            whackTimeLeft--;
+            document.getElementById('whack-time').innerText = whackTimeLeft;
+            if (whackTimeLeft <= 0) {
+                stopWhackGame();
+                window.scrollTo(0, 0);
+                document.getElementById('final-score-number').innerText = whackScore;
+                document.getElementById('final-score-screen').style.display = 'flex';
+                playSuccessSound(); 
+            }
+        }
+
+        function stopWhackGame() {
+            clearInterval(whackTimerInterval);
+            whackHoleTimeouts.forEach(t => clearTimeout(t));
+            document.querySelectorAll('.whack-item').forEach(el => el.classList.remove('popped'));
+            whackHoleActive.fill(false);
+        }
+
+        function spawnWhackItemsLoop() {
+            if (whackTimeLeft <= 0) return;
+            
+            // Reduced max simultaneous spawns to 2 for lower cognitive load
+            const numToSpawn = Math.floor(Math.random() * 2) + 1;
+            for(let i=0; i<numToSpawn; i++) {
+                const availHoles = whackHoleActive.map((act, idx) => act ? -1 : idx).filter(idx => idx !== -1);
+                if(availHoles.length === 0) break;
+                
+                const holeIdx = availHoles[Math.floor(Math.random() * availHoles.length)];
+                
+                // Keep target presence high to stay engaging for special ed
+                const isTarget = Math.random() < 0.45;
+                let itemData = whackGameTarget;
+                if (!isTarget) {
+                    itemData = whackGamePool[Math.floor(Math.random() * whackGamePool.length)];
+                }
+                
+                whackHoleActive[holeIdx] = true;
+                const holeEl = document.getElementById(`whack-item-${holeIdx}`);
+                holeEl.innerHTML = itemData.e; 
+                holeEl.dataset.word = itemData.w;
+                holeEl.style.transform = ''; 
+                holeEl.classList.remove('bounce');
+                holeEl.classList.add('popped');
+                
+                // EXTRA SLOWED DOWN: 5.0 seconds stay time
+                const stayTime = 4500 + Math.random() * 1000; 
+                
+                whackHoleTimeouts[holeIdx] = setTimeout(() => {
+                    if (holeEl.classList.contains('popped')) {
+                        holeEl.classList.remove('popped');
+                        setTimeout(() => { whackHoleActive[holeIdx] = false; }, 400);
+                    }
+                }, stayTime);
+            }
+            
+            // SPAWN INTERVAL: 2.5 - 4 seconds
+            const nextSpawnWait = 2500 + Math.random() * 1500; 
+            if (whackTimeLeft > 0) setTimeout(spawnWhackItemsLoop, nextSpawnWait);
+        }
+
+        function handleWhackClick(holeIdx) {
+            if (!whackHoleActive[holeIdx]) return;
+            const holeEl = document.getElementById(`whack-item-${holeIdx}`);
+            if (!holeEl.classList.contains('popped')) return;
+
+            const struckWord = holeEl.dataset.word;
+            
+            if (struckWord === whackGameTarget.w) {
+                whackScore++;
+                document.getElementById('whack-score').innerText = whackScore;
+                playSuccessSound();
+                speakSuccess_zh(struckWord);
+                
+                // Visual feedback of correct hit
+                holeEl.style.transform = 'scale(1.3) translateY(-10px)';
+                holeEl.classList.remove('popped');
+
+                setTimeout(() => {
+                    holeEl.style.transform = '';
+                    whackHoleActive[holeIdx] = false;
+                }, 300);
+                
+                clearTimeout(whackHoleTimeouts[holeIdx]);
+            } else {
+                playWrongSound();
+                speakWord('Oops!');
+                holeEl.classList.add('bounce');
+                setTimeout(() => holeEl.classList.remove('bounce'), 500);
+            }
+        }
+
+        window.onload = initMenu;
+    </script>
+</body>
+</html>
